@@ -9,12 +9,17 @@ driver = webdriver.Chrome("C:/Users/vicke/Documents/Python Scripts/Kanjiscraper/
 
 kanjis = []
 keywords = []
+urls = []
+onyomis = []
+kunyomis = []
+
 
 url = "https://hochanh.github.io/rtk/%E4%B8%80/index.html"
 stop_url = "https://hochanh.github.io/rtk//index.html"
 
 while url != stop_url:
     driver.get(url)
+    urls.append(url)
     content = driver.page_source
     soup = bs(content)
     kanji = soup.find('a', href= "../index.html").text
@@ -23,6 +28,12 @@ while url != stop_url:
     kanjis.append(kanji)
     new_url = soup.find('span', attrs={'class':'right-arrow'}).find('a')['href'][3:]
     url = "https://hochanh.github.io/rtk/" + new_url
+    readings = soup.find('h3').find_all('a')
+    onyomis.append(readings[0].text)
+    if len(readings)!=1:
+        kunyomis.append(readings[1].text)
+    else:
+        kunyomis.append('None')
 
-df = pd.DataFrame({'Kanji':kanjis, 'Keyword':keywords})
+df = pd.DataFrame({ "Link":urls, 'Onyomi':onyomis, 'Kunyomi':kunyomis, 'Kanji':kanjis, 'Keyword':keywords,})
 df.to_csv('rtk-kanjis.csv', index=False, encoding='utf-8')
